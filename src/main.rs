@@ -19,7 +19,7 @@ fn main() {
         Some(("init", _sub_matches)) => {
             let config_file_path = String::from("config.toml");
             if let Err(e) = gen_default_config_file(&config_file_path) {
-                error!("{}: {}", config_file_path, e);
+                error!("{} ({})", e, config_file_path);
                 exit(1);
             }
         }
