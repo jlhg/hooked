@@ -1,28 +1,50 @@
 use std::error::Error;
-use std::fs::OpenOptions;
+use std::fs::{
+    read_to_string,
+    OpenOptions,
+};
 use std::io::prelude::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
 pub struct Config {
-    github_webhook_secret: String,
-    discord_webhook_url: String
+    pub host: String,
+    pub port: u32,
+    pub build_script_path: String,
+    pub build_dir_path: String,
+    pub github_webhook_secret: String,
+    pub github_watch_push_repository: String,
+    pub github_watch_push_branch: String,
+    pub discord_webhook_url: String
+}
+
+impl Config {
+    pub fn write_to_file(&self, path: &str) -> Result<(), Box<dyn Error>> {
+        let toml = toml::to_string(&self)?;
+        let mut f = OpenOptions::new()
+            .create_new(true)
+            .write(true)
+            .open(path)?;
+        f.write_all(toml.as_bytes())?;
+        Ok(())
+    }
 }
 
 pub fn gen_default_config() -> Config {
     Config {
+        host: String::from("0.0.0.0"),
+        port: 3000,
+        build_script_path: String::from("build_script/entry.sh"),
+        build_dir_path: String::from("build"),
         github_webhook_secret: String::new(),
+        github_watch_push_repository: String::new(),
+        github_watch_push_branch: String::new(),
         discord_webhook_url: String::new()
     }
 }
 
-pub fn gen_default_config_file(out_path: &str) -> Result<(), Box<dyn Error>> {
-    let config = gen_default_config();
-    let toml = toml::to_string(&config)?;
-    let mut f = OpenOptions::new()
-        .create_new(true)
-        .write(true)
-        .open(out_path)?;
-    f.write_all(toml.as_bytes())?;
-    Ok(())
+pub fn read_config_file(path: &str) -> Result<Config, Box<dyn Error>> {
+    let c = read_to_string(path)?;
+    let config = toml::from_str(&c)?;
+    Ok(config)
 }

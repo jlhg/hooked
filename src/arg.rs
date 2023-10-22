@@ -13,7 +13,8 @@ pub fn parse_args() -> Command {
                 .about("Create a new config file")
         )
         .subcommand(
-            Command::new("start")
+            Command::new("server")
                 .about("Start a server")
+                .alias("s")
         )
 }
