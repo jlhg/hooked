@@ -1,10 +1,10 @@
-use std::sync::Arc;
+use crate::crypto::verify_signature;
 use axum::extract::{Extension, Json};
 use axum::http::StatusCode;
 use http::HeaderMap;
-use serde_json::{Value};
-use crate::crypto::verify_signature;
-use tracing::{error};
+use serde_json::Value;
+use std::sync::Arc;
+use tracing::error;
 
 use crate::web::app::AppState;
 use crate::web::object::*;
@@ -22,7 +22,10 @@ pub async fn post_webhooks_github(
             match verify_signature(
                 state.config.github_webhook_secret.as_bytes(),
                 body.as_bytes(),
-                signature.strip_prefix("sha256=").unwrap_or_default().as_bytes(),
+                signature
+                    .strip_prefix("sha256=")
+                    .unwrap_or_default()
+                    .as_bytes(),
             ) {
                 Ok(matched) => {
                     if !matched {
@@ -35,7 +38,7 @@ pub async fn post_webhooks_github(
                 }
             }
         }
-        None => return render_forbidden("missing signature")
+        None => return render_forbidden("missing signature"),
     }
 
     match headers.get("X-GitHub-Event") {
@@ -43,16 +46,15 @@ pub async fn post_webhooks_github(
             let event = v.to_str().unwrap_or("");
             match event {
                 "ping" => {
-                    // TODO
                     return render_success(StatusCode::OK, "ping")
                 }
                 "push" => {
                     // TODO
                     return render_success(StatusCode::OK, "push")
                 }
-                _ => return render_success(StatusCode::OK, "unhandled event")
+                _ => return render_success(StatusCode::OK, "unhandled event"),
             }
         }
-        None => return render_success(StatusCode::OK, "no event")
+        None => return render_success(StatusCode::OK, "no event"),
     }
 }

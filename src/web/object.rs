@@ -1,12 +1,12 @@
 use axum::extract::Json;
 use axum::http::StatusCode;
-use serde::{Serialize};
+use serde::Serialize;
 use serde_json::{json, Value};
 
 #[derive(Serialize)]
 pub struct ResultValue<'a, T = ResultType> {
     pub r#type: T,
-    pub message: &'a str
+    pub message: &'a str,
 }
 
 #[derive(Serialize)]
@@ -18,7 +18,7 @@ pub enum ResultType {
     #[serde(rename = "warning")]
     Warning,
     #[serde(rename = "info")]
-    Info
+    Info,
 }
 
 pub fn render_data(status_code: StatusCode, data: Value) -> (StatusCode, Json<Value>) {
@@ -30,19 +30,43 @@ pub fn render_result(status_code: StatusCode, result: ResultValue) -> (StatusCod
 }
 
 pub fn render_success(status_code: StatusCode, message: &str) -> (StatusCode, Json<Value>) {
-    render_result(status_code, ResultValue{r#type: ResultType::Success, message: message})
+    render_result(
+        status_code,
+        ResultValue {
+            r#type: ResultType::Success,
+            message: message,
+        },
+    )
 }
 
 pub fn render_error(status_code: StatusCode, message: &str) -> (StatusCode, Json<Value>) {
-    render_result(status_code, ResultValue{r#type: ResultType::Error, message: message})
+    render_result(
+        status_code,
+        ResultValue {
+            r#type: ResultType::Error,
+            message: message,
+        },
+    )
 }
 
 pub fn render_warning(status_code: StatusCode, message: &str) -> (StatusCode, Json<Value>) {
-    render_result(status_code, ResultValue{r#type: ResultType::Warning, message: message})
+    render_result(
+        status_code,
+        ResultValue {
+            r#type: ResultType::Warning,
+            message: message,
+        },
+    )
 }
 
 pub fn render_info(status_code: StatusCode, message: &str) -> (StatusCode, Json<Value>) {
-    render_result(status_code, ResultValue{r#type: ResultType::Info, message: message})
+    render_result(
+        status_code,
+        ResultValue {
+            r#type: ResultType::Info,
+            message: message,
+        },
+    )
 }
 
 pub fn render_internal_server_error(message: &str) -> (StatusCode, Json<Value>) {
