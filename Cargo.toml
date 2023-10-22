@@ -10,10 +10,12 @@ clap = { version = "4.4.6", features = ["derive"] }
 hex = "0.4.3"
 hmac = "0.12.1"
 http = "0.2"
+reqwest = { version = "0.11", features = ["blocking", "multipart"] }
 serde = { version = "1.0.189", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10.8"
-tokio = { version = "1.33.0", features = ["full"] }
+tempfile = "3"
+tokio = { version = "1", features = ["full"] }
 toml = { version = "0.8.2" }
 tower = "0.4.13"
 tower-http = { version = "0.4.3", features = ["trace"] }

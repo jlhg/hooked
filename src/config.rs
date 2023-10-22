@@ -7,8 +7,7 @@ use std::io::prelude::*;
 pub struct Config {
     pub host: String,
     pub port: u32,
-    pub build_script_path: String,
-    pub build_dir_path: String,
+    pub build_entry_script_path: String,
     pub github_webhook_secret: String,
     pub github_watch_push_repository: String,
     pub github_watch_push_branch: String,
@@ -28,8 +27,7 @@ pub fn gen_default_config() -> Config {
     Config {
         host: String::from("0.0.0.0"),
         port: 3000,
-        build_script_path: String::from("build_script/entry.sh"),
-        build_dir_path: String::from("build"),
+        build_entry_script_path: String::from("build.sh"),
         github_webhook_secret: String::new(),
         github_watch_push_repository: String::new(),
         github_watch_push_branch: String::new(),
