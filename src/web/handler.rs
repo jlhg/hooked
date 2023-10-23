@@ -119,9 +119,7 @@ pub async fn post_webhooks_github(
                                 }]
                             })
                         }
-                        .as_str()
-                        .expect("failed to convert embeds to JSON string")
-                        .to_owned();
+                        .to_string();
 
                         let form = Form::new()
                             .text("payload_json", payload_json)
