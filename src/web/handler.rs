@@ -58,27 +58,37 @@ pub async fn post_webhooks_github(
                         return render_bad_request("invalid payload");
                     }
 
-                    let branch = payload["ref"]
-                        .as_str()
-                        .unwrap_or("")
-                        .strip_prefix("refs/heads/")
-                        .unwrap_or("");
+                    let mut branch = payload["ref"].to_string();
+                    if branch == "null" {
+                        return render_bad_request("invalid [ref] value in the payload");
+                    }
 
-                    if branch == "" {
+                    branch = branch.strip_prefix("refs/heads/").unwrap_or("null").to_string();
+                    if branch == "null" {
                         return render_bad_request("invalid [ref] value in the payload");
                     }
 
                     if branch == state.config.github_watch_push_branch {
-                        let repo = payload["repository"]["full_name"].as_str().unwrap_or("");
-                        if repo == "" {
+                        let repo = payload["repository"]["full_name"].to_string();
+                        if repo == "null" {
                             return render_bad_request(
                                 "invalid [repository.full_name] value in the payload",
                             );
                         }
 
-                        let commit_id = payload["after"].as_str().unwrap_or("");
-                        if commit_id == "" {
+                        let commit_id = payload["after"].to_string();
+                        if commit_id == "null" {
                             return render_bad_request("invalid [after] value in the payload");
+                        }
+
+                        let head_commit_url = payload["head_commit"]["url"].to_string();
+                        if head_commit_url == "null" {
+                            return render_bad_request("invalid [head_commit.url] value in the payload");
+                        }
+
+                        let head_commit_committer_username = payload["head_commit"]["committer"]["username"].to_string();
+                        if head_commit_committer_username == "null" {
+                            return render_bad_request("invalid [head_commit.committer.username] value in the payload");
                         }
 
                         let output = Command::new(&state.config.build_entry_script_path)
@@ -101,21 +111,32 @@ pub async fn post_webhooks_github(
                         write!(stdout_file, "{}", stdout_str).expect("failed to write stdout file");
                         write!(stderr_file, "{}", stderr_str).expect("failed to write stderr file");
 
-                        let description = format!("repo: {}, commit ID: {}", repo, commit_id);
                         let payload_json = if output.status.success() {
                             json!({
                                 "embeds": [{
                                     "title": "Deployment Success",
+                                    "url": head_commit_url,
                                     "color": 10731148, // #a3be8c
-                                    "description": description
+                                    "fields": [
+                                        { "name": "Repository", "value": repo},
+                                        { "name": "Branch", "value": branch, "inline": true},
+                                        { "name": "Commit ID", "value": commit_id, "inline": true},
+                                        { "name": "Committer", "value": head_commit_committer_username }
+                                    ]
                                 }]
                             })
                         } else {
                             json!({
                                 "embeds": [{
                                     "title": "Deployment Failed",
+                                    "url": head_commit_url,
                                     "color": 12542314, // "#bf616a"
-                                    "description": description
+                                    "fields": [
+                                        { "name": "Repository", "value": repo},
+                                        { "name": "Branch", "value": branch, "inline": true},
+                                        { "name": "Commit ID", "value": commit_id, "inline": true},
+                                        { "name": "Committer", "value": head_commit_committer_username }
+                                    ]
                                 }]
                             })
                         }
