@@ -9,6 +9,6 @@ commit_id=$1
 # cd /path/to/your/project
 # git fetch
 # git checkout $commit_id
-# docker compose build --progress plain
+# docker compose --progress plain build
 # docker compose down
 # docker compose up -d
