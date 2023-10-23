@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 commit_id=$1
 
