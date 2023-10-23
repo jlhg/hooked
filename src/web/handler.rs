@@ -120,7 +120,7 @@ pub async fn post_webhooks_github(
                                     "fields": [
                                         { "name": "Repository", "value": repo},
                                         { "name": "Branch", "value": branch, "inline": true},
-                                        { "name": "Commit ID", "value": commit_id, "inline": true},
+                                        { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
                                         { "name": "Committer", "value": head_commit_committer_username }
                                     ]
                                 }]
@@ -134,7 +134,7 @@ pub async fn post_webhooks_github(
                                     "fields": [
                                         { "name": "Repository", "value": repo},
                                         { "name": "Branch", "value": branch, "inline": true},
-                                        { "name": "Commit ID", "value": commit_id, "inline": true},
+                                        { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
                                         { "name": "Committer", "value": head_commit_committer_username }
                                     ]
                                 }]
