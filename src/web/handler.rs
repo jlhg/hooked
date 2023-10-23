@@ -127,48 +127,35 @@ pub async fn post_webhooks_github(
                         write!(stderr_file, "{}", stderr_str).expect("failed to write stderr file");
 
                         let payload_json = if output.status.success() {
-                            // color: #a3be8c
-                            format!(r#"{{
-                              "embeds": [{{
-                                  "title": "Deployment Success",
-                                  "url": {url},
-                                  "color": 10731148,
-                                  "fields": [
-                                      {{ "name": "Repository", "value": {repo}}},
-                                      {{ "name": "Branch", "value": {branch}, "inline": true}},
-                                      {{ "name": "Commit ID", "value": {commit_id}, "inline": true}},
-                                      {{ "name": "Committer", "value": {head_commit_committer_username} }}
-                                  ]
-                              }}]
-                            }}"#,
-                                    url=head_commit_url,
-                                    repo=repo,
-                                    branch=branch,
-                                    commit_id=&commit_id[..7],
-                                    head_commit_committer_username=head_commit_committer_username
-                            )
+                            json!({
+                                "embeds": [{
+                                    "title": "Deployment Success",
+                                    "url": head_commit_url,
+                                    "color": 10731148, // #a3be8c
+                                    "fields": [
+                                        { "name": "Repository", "value": repo},
+                                        { "name": "Branch", "value": branch, "inline": true},
+                                        { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
+                                        { "name": "Committer", "value": head_commit_committer_username }
+                                    ]
+                                }]
+                            })
                         } else {
-                            // color: #bf616a
-                            format!(r#"{{
-                              "embeds": [{{
-                                  "title": "Deployment Failed",
-                                  "url": {url},
-                                  "color": 12542314,
-                                  "fields": [
-                                      {{ "name": "Repository", "value": {repo}}},
-                                      {{ "name": "Branch", "value": {branch}, "inline": true}},
-                                      {{ "name": "Commit ID", "value": {commit_id}, "inline": true}},
-                                      {{ "name": "Committer", "value": {head_commit_committer_username} }}
-                                  ]
-                              }}]
-                            }}"#,
-                                    url=head_commit_url,
-                                    repo=repo,
-                                    branch=branch,
-                                    commit_id=&commit_id[..7],
-                                    head_commit_committer_username=head_commit_committer_username
-                            )
-                        };
+                            json!({
+                                "embeds": [{
+                                    "title": "Deployment Failed",
+                                    "url": head_commit_url,
+                                    "color": 12542314, // "#bf616a"
+                                    "fields": [
+                                        { "name": "Repository", "value": repo},
+                                        { "name": "Branch", "value": branch, "inline": true},
+                                        { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
+                                        { "name": "Committer", "value": head_commit_committer_username }
+                                    ]
+                                }]
+                            })
+                        }
+                        .to_string();
 
                         let form = Form::new()
                             .text("payload_json", payload_json)
