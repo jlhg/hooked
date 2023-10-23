@@ -43,6 +43,7 @@ Edit the config file. The available options are described below:
 - `github_watch_push_branch`: The Git branch name to watch.
 - `discord_webhook_url`: The Discord webhook URL to send the notification to Discord channel. See [Intro to Webhooks – Discord](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) for creating a Discord webhook URL.
 
+Configure the Github Webhook. Set the payload URL to `<your-server-address>/webhooks/github`.
 
 Copy the example `build.sh` to the current directory. Open it and add whatever commands you want to execute.
 
