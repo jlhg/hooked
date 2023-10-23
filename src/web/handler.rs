@@ -106,75 +106,77 @@ pub async fn post_webhooks_github(
                             );
                         }
 
-                        let output = Command::new(&state.config.build_entry_script_path)
-                            .arg(&commit_id)
-                            .output()
-                            .expect("failed to execute the process");
+                        tokio::spawn(async move {
+                            let output = Command::new(&state.config.build_entry_script_path)
+                                .arg(&commit_id)
+                                .output()
+                                .expect("failed to execute the process");
 
-                        let stdout_str = String::from_utf8(output.stdout)
-                            .expect("failed to process stdout content");
-                        let stderr_str = String::from_utf8(output.stderr)
-                            .expect("failed to process stderr content");
+                            let stdout_str = String::from_utf8(output.stdout)
+                                .expect("failed to process stdout content");
+                            let stderr_str = String::from_utf8(output.stderr)
+                                .expect("failed to process stderr content");
 
-                        let temp_dir = tempdir().expect("failed to create temporary directory");
-                        let stdout_file_path = temp_dir.path().join("stdout.txt");
-                        let stderr_file_path = temp_dir.path().join("stderr.txt");
-                        let mut stdout_file =
-                            File::create(&stdout_file_path).expect("failed to create stdout file");
-                        let mut stderr_file =
-                            File::create(&stderr_file_path).expect("failed to create stderr file");
-                        write!(stdout_file, "{}", stdout_str).expect("failed to write stdout file");
-                        write!(stderr_file, "{}", stderr_str).expect("failed to write stderr file");
+                            let temp_dir = tempdir().expect("failed to create temporary directory");
+                            let stdout_file_path = temp_dir.path().join("stdout.txt");
+                            let stderr_file_path = temp_dir.path().join("stderr.txt");
+                            let mut stdout_file =
+                                File::create(&stdout_file_path).expect("failed to create stdout file");
+                            let mut stderr_file =
+                                File::create(&stderr_file_path).expect("failed to create stderr file");
+                            write!(stdout_file, "{}", stdout_str).expect("failed to write stdout file");
+                            write!(stderr_file, "{}", stderr_str).expect("failed to write stderr file");
 
-                        let payload_json = if output.status.success() {
-                            json!({
-                                "embeds": [{
-                                    "title": "Deployment Success",
-                                    "url": head_commit_url,
-                                    "color": 10731148, // #a3be8c
-                                    "fields": [
-                                        { "name": "Repository", "value": repo},
-                                        { "name": "Branch", "value": branch, "inline": true},
-                                        { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
-                                        { "name": "Committer", "value": head_commit_committer_username }
-                                    ]
-                                }]
-                            })
-                        } else {
-                            json!({
-                                "embeds": [{
-                                    "title": "Deployment Failed",
-                                    "url": head_commit_url,
-                                    "color": 12542314, // "#bf616a"
-                                    "fields": [
-                                        { "name": "Repository", "value": repo},
-                                        { "name": "Branch", "value": branch, "inline": true},
-                                        { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
-                                        { "name": "Committer", "value": head_commit_committer_username }
-                                    ]
-                                }]
-                            })
-                        }
-                        .to_string();
+                            let payload_json = if output.status.success() {
+                                json!({
+                                    "embeds": [{
+                                        "title": "Deployment Success",
+                                        "url": head_commit_url,
+                                        "color": 10731148, // #a3be8c
+                                        "fields": [
+                                            { "name": "Repository", "value": repo},
+                                            { "name": "Branch", "value": branch, "inline": true},
+                                            { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
+                                            { "name": "Committer", "value": head_commit_committer_username }
+                                        ]
+                                    }]
+                                })
+                            } else {
+                                json!({
+                                    "embeds": [{
+                                        "title": "Deployment Failed",
+                                        "url": head_commit_url,
+                                        "color": 12542314, // "#bf616a"
+                                        "fields": [
+                                            { "name": "Repository", "value": repo},
+                                            { "name": "Branch", "value": branch, "inline": true},
+                                            { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
+                                            { "name": "Committer", "value": head_commit_committer_username }
+                                        ]
+                                    }]
+                                })
+                            }
+                            .to_string();
 
-                        let form = Form::new()
-                            .text("payload_json", payload_json)
-                            .file("file1", &stdout_file_path)
-                            .expect("failed to attach file1")
-                            .file("file2", &stderr_file_path)
-                            .expect("failed to attach file2");
+                            let form = Form::new()
+                                .text("payload_json", payload_json)
+                                .file("file1", &stdout_file_path)
+                                .expect("failed to attach file1")
+                                .file("file2", &stderr_file_path)
+                                .expect("failed to attach file2");
 
-                        let _resp = Client::new()
-                            .post(&state.config.discord_webhook_url)
-                            .multipart(form)
-                            .send()
-                            .expect("failed to send the request to Discord");
+                            let _resp = Client::new()
+                                .post(&state.config.discord_webhook_url)
+                                .multipart(form)
+                                .send()
+                                .expect("failed to send the request to Discord");
 
-                        drop(stdout_file);
-                        drop(stderr_file);
-                        let _ = temp_dir.close();
+                            drop(stdout_file);
+                            drop(stderr_file);
+                            let _ = temp_dir.close();
+                        });
 
-                        return render_success(StatusCode::OK, "push event ok");
+                        return render_success(StatusCode::OK, "push event accepted");
                     }
 
                     return render_success(StatusCode::OK, "unhandled branch");
