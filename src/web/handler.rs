@@ -106,7 +106,7 @@ pub async fn post_webhooks_github(
                             json!({
                                 "embeds": [{
                                     "title": "Deployment Success",
-                                    "color": "#a3be8c",
+                                    "color": 10731148, // #a3be8c
                                     "description": description
                                 }]
                             })
@@ -114,7 +114,7 @@ pub async fn post_webhooks_github(
                             json!({
                                 "embeds": [{
                                     "title": "Deployment Failed",
-                                    "color": "#bf616a",
+                                    "color": 12542314, // "#bf616a"
                                     "description": description
                                 }]
                             })
