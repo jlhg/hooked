@@ -26,7 +26,7 @@ pub fn gen_default_config() -> Config {
     Config {
         host: String::from("0.0.0.0"),
         port: 3000,
-        build_entry_script_path: String::from("build.sh"),
+        build_entry_script_path: String::from("./build.sh"),
         github_webhook_secret: String::new(),
         github_watch_push_branch: String::new(),
         discord_webhook_url: String::new(),
