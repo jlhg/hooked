@@ -38,7 +38,7 @@ Edit the config file. The available options are described below:
 
 - `host`: The domain or IP address where the server is hosted.
 - `port`: The port number where the server is listening.
-- `build_entry_script_path`: Path to the build and deployment script.
+- `build_entry_script_path`: Path to the build entry script.
 - `github_webhook_secret`: The token to verify the incoming GitHub webhook messages. See [Creating webhooks - GitHub Docs](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks) for creating a webhook and setting the secret token.
 - `github_watch_push_branch`: The Git branch name to watch.
 - `discord_webhook_url`: The Discord webhook URL to send the notification to Discord channel. See [Intro to Webhooks – Discord](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) for creating a Discord webhook URL.
