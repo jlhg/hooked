@@ -70,26 +70,40 @@ pub async fn post_webhooks_github(
                     }
 
                     if branch == state.config.github_watch_push_branch {
-                        let repo = payload["repository"]["full_name"].to_string();
-                        if repo == "null" {
+                        let repo = payload["repository"]["full_name"]
+                            .as_str()
+                            .unwrap_or_default()
+                            .to_string();
+                        if repo.is_empty() {
                             return render_bad_request(
                                 "invalid [repository.full_name] value in the payload",
                             );
                         }
 
-                        let commit_id = payload["after"].to_string();
-                        if commit_id == "null" {
+                        let commit_id = payload["after"].as_str().unwrap_or_default().to_string();
+                        if commit_id.is_empty() {
                             return render_bad_request("invalid [after] value in the payload");
                         }
 
-                        let head_commit_url = payload["head_commit"]["url"].to_string();
-                        if head_commit_url == "null" {
-                            return render_bad_request("invalid [head_commit.url] value in the payload");
+                        let head_commit_url = payload["head_commit"]["url"]
+                            .as_str()
+                            .unwrap_or_default()
+                            .to_string();
+                        if head_commit_url.is_empty() {
+                            return render_bad_request(
+                                "invalid [head_commit.url] value in the payload",
+                            );
                         }
 
-                        let head_commit_committer_username = payload["head_commit"]["committer"]["username"].to_string();
-                        if head_commit_committer_username == "null" {
-                            return render_bad_request("invalid [head_commit.committer.username] value in the payload");
+                        let head_commit_committer_username = payload["head_commit"]["committer"]
+                            ["username"]
+                            .as_str()
+                            .unwrap_or_default()
+                            .to_string();
+                        if head_commit_committer_username.is_empty() {
+                            return render_bad_request(
+                                "invalid [head_commit.committer.username] value in the payload",
+                            );
                         }
 
                         let output = Command::new(&state.config.build_entry_script_path)
