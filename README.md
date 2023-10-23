@@ -1,6 +1,6 @@
 # hooked
 
-A simple command-line CI/CD tool that triggers custom build and deployment commands when it receives GitHub webhook. It also supports Discord notification (including the stdout and stderr output).
+A simple command-line CI/CD tool that triggers custom build and deployment commands when it receives the GitHub webhook messages. It also supports Discord notification (including the stdout and stderr output).
 
 ## Screenshots
 
