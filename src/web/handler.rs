@@ -7,7 +7,7 @@ use axum::extract::{Extension, Json};
 use axum::http::StatusCode;
 use http::HeaderMap;
 use reqwest::blocking::{multipart::Form, Client};
-use serde_json::Value;
+use serde_json::{json, Value};
 use tempfile::tempdir;
 use tracing::error;
 
@@ -69,6 +69,13 @@ pub async fn post_webhooks_github(
                     }
 
                     if branch == state.config.github_watch_push_branch {
+                        let repo = payload["repository"]["full_name"].as_str().unwrap_or("");
+                        if repo == "" {
+                            return render_bad_request(
+                                "invalid [repository.full_name] value in the payload",
+                            );
+                        }
+
                         let commit_id = payload["after"].as_str().unwrap_or("");
                         if commit_id == "" {
                             return render_bad_request("invalid [after] value in the payload");
@@ -94,15 +101,30 @@ pub async fn post_webhooks_github(
                         write!(stdout_file, "{}", stdout_str).expect("failed to write stdout file");
                         write!(stderr_file, "{}", stderr_str).expect("failed to write stderr file");
 
-                        let content: &str;
-                        if output.status.success() {
-                            content = r#"{"content": "build & deployment success."}"#;
+                        let description = format!("repo: {}, commit ID: {}", repo, commit_id);
+                        let payload_json = if output.status.success() {
+                            json!({
+                                "embeds": [{
+                                    "title": "Deployment Success",
+                                    "color": "#a3be8c",
+                                    "description": description
+                                }]
+                            })
                         } else {
-                            content = r#"{"content": "build & deployment failed."}"#;
+                            json!({
+                                "embeds": [{
+                                    "title": "Deployment Failed",
+                                    "color": "#bf616a",
+                                    "description": description
+                                }]
+                            })
                         }
+                        .as_str()
+                        .expect("failed to convert embeds to JSON string")
+                        .to_owned();
 
                         let form = Form::new()
-                            .text("payload_json", content)
+                            .text("payload_json", payload_json)
                             .file("file1", &stdout_file_path)
                             .expect("failed to attach file1")
                             .file("file2", &stderr_file_path)
