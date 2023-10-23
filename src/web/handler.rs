@@ -58,12 +58,12 @@ pub async fn post_webhooks_github(
                         return render_bad_request("invalid payload");
                     }
 
-                    let mut branch = payload["ref"].to_string();
-                    if branch == "null" {
+                    let git_ref = payload["ref"].to_string();
+                    if git_ref == "null" {
                         return render_bad_request("invalid [ref] value in the payload");
                     }
 
-                    branch = branch.strip_prefix("refs/heads/").unwrap_or("null").to_string();
+                    let branch = git_ref.strip_prefix("refs/heads/").unwrap_or("null");
                     if branch == "null" {
                         return render_bad_request("invalid [ref] value in the payload");
                     }
