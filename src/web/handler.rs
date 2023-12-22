@@ -95,14 +95,14 @@ pub async fn post_webhooks_github(
                             );
                         }
 
-                        let head_commit_committer_username = payload["head_commit"]["committer"]
-                            ["username"]
+                        let head_commit_committer_name = payload["head_commit"]["committer"]
+                            ["name"]
                             .as_str()
                             .unwrap_or_default()
                             .to_string();
-                        if head_commit_committer_username.is_empty() {
+                        if head_commit_committer_name.is_empty() {
                             return render_bad_request(
-                                "invalid [head_commit.committer.username] value in the payload",
+                                "invalid [head_commit.committer.name] value in the payload",
                             );
                         }
 
@@ -137,7 +137,7 @@ pub async fn post_webhooks_github(
                                             { "name": "Repository", "value": repo},
                                             { "name": "Branch", "value": branch, "inline": true},
                                             { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
-                                            { "name": "Committer", "value": head_commit_committer_username }
+                                            { "name": "Committer", "value": head_commit_committer_name }
                                         ]
                                     }]
                                 })
@@ -151,7 +151,7 @@ pub async fn post_webhooks_github(
                                             { "name": "Repository", "value": repo},
                                             { "name": "Branch", "value": branch, "inline": true},
                                             { "name": "Commit ID", "value": &commit_id[..7], "inline": true},
-                                            { "name": "Committer", "value": head_commit_committer_username }
+                                            { "name": "Committer", "value": head_commit_committer_name }
                                         ]
                                     }]
                                 })
