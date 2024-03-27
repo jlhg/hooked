@@ -1,28 +1,33 @@
-use std::sync::Arc;
-
+use crate::config::Config;
+use crate::web::handler::webhook::*;
 use anyhow::Result;
 use axum::{extract::Extension, routing::post, Router};
+use std::sync::Arc;
 use tower::ServiceBuilder;
 use tower_http::{
+    cors::CorsLayer,
     trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse, TraceLayer},
     LatencyUnit,
 };
+use tracing::info;
 use tracing::Level;
 
-use crate::config::Config;
-use crate::web::handler::post_webhooks_github;
-
-pub struct AppState {
-    pub config: Config,
+#[derive(Clone)]
+pub struct Context {
+    pub config: Arc<Config>,
 }
 
 fn new_router() -> Router {
-    Router::new().route("/webhooks/github", post(post_webhooks_github))
+    Router::new()
+        .route("/webhooks/github", post(post_webhooks_github))
+        .layer(CorsLayer::permissive())
 }
 
-pub async fn start_server(cfg: Config) -> Result<()> {
-    let bind_addr = cfg.host.clone() + ":" + &cfg.port.to_string();
-    let state = Arc::new(AppState { config: cfg });
+pub async fn start_server(config: Config) -> Result<()> {
+    let bind_addr = config.bind_addr();
+    let ctx = Context {
+        config: Arc::new(config),
+    };
 
     let r = new_router().layer(
         ServiceBuilder::new()
@@ -36,12 +41,12 @@ pub async fn start_server(cfg: Config) -> Result<()> {
                             .latency_unit(LatencyUnit::Micros),
                     ),
             )
-            .layer(Extension(state)),
+            .layer(Extension(ctx)),
     );
 
-    axum::Server::bind(&bind_addr.parse()?)
-        .serve(r.into_make_service())
-        .await?;
+    info!("starting a server");
+    let listener = tokio::net::TcpListener::bind(bind_addr).await?;
+    axum::serve(listener, r).await?;
 
     Ok(())
 }

@@ -1,0 +1,20 @@
+version: "3.8"
+x-common: &common
+  build: .
+services:
+  web:
+    <<: *common
+    command: "hooked"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./srv/web/:/app/
+    ports:
+      - 3000:3000
+    environment:
+      - LOG_FILE_PATH=log/app.log
+      - HOOKED_HOST=0.0.0.0
+      - HOOKED_PORT=3000
+      - BUILD_ENTRY_SCRIPT_PATH=./build.sh
+      - GITHUB_WEBHOOK_SECRET=
+      - GITHUB_WATCH_PUSH_BRANCH=
+      - DISCORD_WEBHOOK_URL=

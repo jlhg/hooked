@@ -17,7 +17,7 @@ pub fn setup_logger(log_path: &str) -> Result<WorkerGuard> {
 
     let subscriber = fmt::Subscriber::builder()
         .with_ansi(false)
-        .with_max_level(Level::DEBUG)
+        .with_max_level(Level::INFO)
         .finish()
         .with(
             fmt::Layer::default()

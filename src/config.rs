@@ -1,40 +1,45 @@
-use serde::{Deserialize, Serialize};
-use std::error::Error;
-use std::fs::{read_to_string, OpenOptions};
-use std::io::prelude::*;
+use clap::Parser;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Parser)]
+#[command(version, about, long_about = None)]
 pub struct Config {
+    /// Path to the log file.
+    #[arg(short, long = "log", env = "LOG_FILE_PATH", default_value = "log/app.log")]
+    pub log_file_path: String,
+
+    /// The IP address where the server is hosted.
+    #[arg(short = 'b', long, env = "HOOKED_HOST", default_value = "0.0.0.0")]
     pub host: String,
-    pub port: u32,
+
+    /// The port number where the server is listening.
+    #[arg(short, long, env = "HOOKED_PORT", default_value_t = 3000)]
+    pub port: u16,
+
+    /// Path to the build entry script.
+    #[arg(long, env)]
     pub build_entry_script_path: String,
+
+    /// The token to verify the incoming GitHub webhook messages. See
+    /// [Creating webhooks - GitHub
+    /// Docs](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks)
+    /// for creating a webhook and setting the secret token.
+    #[arg(long, env)]
     pub github_webhook_secret: String,
+
+    /// The Git branch name to watch.
+    #[arg(long, env)]
     pub github_watch_push_branch: String,
+
+    /// The Discord webhook URL to send the notification to Discord
+    /// channel. See [Intro to Webhooks –
+    /// Discord](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
+    /// for creating a Discord webhook URL.
+    #[arg(long, env)]
     pub discord_webhook_url: String,
 }
 
 impl Config {
-    pub fn write_to_file(&self, path: &str) -> Result<(), Box<dyn Error>> {
-        let toml = toml::to_string(&self)?;
-        let mut f = OpenOptions::new().create_new(true).write(true).open(path)?;
-        f.write_all(toml.as_bytes())?;
-        Ok(())
+    pub fn bind_addr(&self) -> String {
+        format!("{}:{}", self.host, self.port)
     }
-}
-
-pub fn gen_default_config() -> Config {
-    Config {
-        host: String::from("0.0.0.0"),
-        port: 3000,
-        build_entry_script_path: String::from("./build.sh"),
-        github_webhook_secret: String::new(),
-        github_watch_push_branch: String::new(),
-        discord_webhook_url: String::new(),
-    }
-}
-
-pub fn read_config_file(path: &str) -> Result<Config, Box<dyn Error>> {
-    let c = read_to_string(path)?;
-    let config = toml::from_str(&c)?;
-    Ok(config)
 }

@@ -28,20 +28,21 @@ You can find the executable file at `./target/release/hooked`.
 
 ## Usage
 
-Create a new config file:
+Find the usage:
 
 ```txt
-hooked init
+hooked --help
 ```
 
-Edit the config file. The available options are described below:
+The available arguments are described below:
 
-- `host`: The domain or IP address where the server is hosted.
-- `port`: The port number where the server is listening.
-- `build_entry_script_path`: Path to the build entry script.
-- `github_webhook_secret`: The token to verify the incoming GitHub webhook messages. See [Creating webhooks - GitHub Docs](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks) for creating a webhook and setting the secret token.
-- `github_watch_push_branch`: The Git branch name to watch.
-- `discord_webhook_url`: The Discord webhook URL to send the notification to Discord channel. See [Intro to Webhooks – Discord](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) for creating a Discord webhook URL.
+- `-l, --log`: The domain or IP address where the server is hosted.
+- `-b, --host`: The domain or IP address where the server is hosted.
+- `-p, --port`: The port number where the server is listening.
+- `--build-entry-script-path`: Path to the build entry script.
+- `--github-webhook-secret`: The token to verify the incoming GitHub webhook messages. See [Creating webhooks - GitHub Docs](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks) for creating a webhook and setting the secret token.
+- `--github-watch-push-branch`: The Git branch name to watch.
+- `--discord-webhook-url`: The Discord webhook URL to send the notification to Discord channel. See [Intro to Webhooks – Discord](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) for creating a Discord webhook URL.
 
 Configure the Github Webhook. Set the payload URL to `<your-server-address>/webhooks/github`.
 
@@ -54,11 +55,11 @@ cp example/build.sh .
 Finally, start the web server:
 
 ```txt
-hooked server
-# OR
-hooked s
+hooked -b 0.0.0.0 -p 3000 --build-entry-script-path=./build.sh \
+  --github-webhook-secret=<string> --github-watch-push-branch=master \
+  --discord-webhook-url=<string>
 ```
 
 ## License
 
-MIT
+Released under the [MIT License](https://opensource.org/license/mit/).
