@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.77.1 as build
+FROM rust:1.77.0 as build
 WORKDIR /app
 COPY . /app
 RUN env OPENSSL_LIB_DIR=/usr/lib/ssl/ OPENSSL_INCLUDE_DIR=/usr/include/openssl/ OPENSSL_STATIC=yes \
