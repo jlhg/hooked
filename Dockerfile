@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.77.0 as build
+FROM rust:1.77.1 as build
 WORKDIR /app
 COPY . /app
-RUN env OPENSSL_LIB_DIR=/usr/local/lib/ OPENSSL_INCLUDE_DIR=/usr/local/include OPENSSL_STATIC=yes \
+RUN env OPENSSL_LIB_DIR=/usr/lib/ssl/ OPENSSL_INCLUDE_DIR=/usr/include/openssl/ OPENSSL_STATIC=yes \
     cargo install --locked --path .
 
 FROM debian:bookworm-slim
