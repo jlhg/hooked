@@ -7,6 +7,8 @@ RUN env OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu/ OPENSSL_INCLUDE_DIR=/usr/incl
 
 FROM debian:bookworm-slim
 WORKDIR /app
-# RUN apt-get update && apt-get install -y libssl-dev ca-certificates curl && rm -rf /var/lib/apt/lists/*
-# RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN apt-get update && apt-get install -y git curl && rm -rf /var/lib/apt/lists/*
+RUN curl -LOJR https://download.docker.com/linux/debian/dists/bookworm/pool/stable/amd64/docker-ce-cli_25.0.5-1~debian.12~bookworm_amd64.deb && \
+    dpkg -i docker-ce-cli_25.0.5-1~debian.12~bookworm_amd64.deb && \
+    rm docker-ce-cli_25.0.5-1~debian.12~bookworm_amd64.deb
 COPY --from=build /usr/local/cargo/bin/hooked /usr/local/bin/hooked
