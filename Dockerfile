@@ -2,7 +2,7 @@
 FROM rust:1.77.0 as build
 WORKDIR /app
 COPY . /app
-RUN env OPENSSL_LIB_DIR=/usr/lib/ssl/ OPENSSL_INCLUDE_DIR=/usr/include/openssl/ OPENSSL_STATIC=yes \
+RUN env OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu/ OPENSSL_INCLUDE_DIR=/usr/include/x86_64-linux-gnu/openssl/ OPENSSL_STATIC=yes \
     cargo install --locked --path .
 
 FROM debian:bookworm-slim
