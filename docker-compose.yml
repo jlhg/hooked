@@ -5,8 +5,12 @@ services:
     <<: *common
     command: "hooked"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - ./srv/web/:/app/
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/service/myrepo/:/repo/
+      - /home/service/.ssh/config:/home/service/.ssh/config:ro
+      - /home/service/.ssh/id_ed25519-myrepo:/home/service/.ssh/id_ed25519-myrepo:ro
+      - /home/service/.ssh/id_ed25519-myrepodep:/repo/id_ed25519:ro
     ports:
       - 3000:3000
     environment:
