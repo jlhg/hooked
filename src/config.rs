@@ -4,20 +4,12 @@ use clap::Parser;
 #[derive(Parser)]
 #[command(version, about, long_about = None, disable_help_flag = true)]
 pub struct Config {
-    #[arg(short = '?', long = "help", action = ArgAction::Help, help = "Print help", required = false)]
-    pub help: bool,
-
     /// Path to the log file.
-    #[arg(
-        short,
-        long = "log",
-        env = "LOG_FILE_PATH",
-        default_value = "log/app.log"
-    )]
+    #[arg(short, long = "log", env, default_value = "log/app.log")]
     pub log_file_path: String,
 
     /// The IP address where the server is hosted.
-    #[arg(short = 'h', long, env = "HOOKED_HOST", default_value = "0.0.0.0")]
+    #[arg(short, long, env = "HOOKED_HOST", default_value = "0.0.0.0")]
     pub host: String,
 
     /// The port number where the server is listening.
@@ -45,6 +37,9 @@ pub struct Config {
     /// for creating a Discord webhook URL.
     #[arg(long, env)]
     pub discord_webhook_url: String,
+
+    #[arg(short = '?', long, action = ArgAction::Help, help = "Print help")]
+    pub help: (),
 }
 
 impl Config {
