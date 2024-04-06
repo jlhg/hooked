@@ -37,7 +37,7 @@ hooked --help
 The available arguments are described below:
 
 - `-l, --log`: The domain or IP address where the server is hosted.
-- `-b, --host`: The domain or IP address where the server is hosted.
+- `-h, --host`: The domain or IP address where the server is hosted.
 - `-p, --port`: The port number where the server is listening.
 - `--build-entry-script-path`: Path to the build entry script.
 - `--github-webhook-secret`: The token to verify the incoming GitHub webhook messages. See [Creating webhooks - GitHub Docs](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks) for creating a webhook and setting the secret token.
@@ -55,7 +55,7 @@ cp example/build.sh .
 Finally, start the web server:
 
 ```txt
-hooked -b 0.0.0.0 -p 3000 --build-entry-script-path=./build.sh \
+hooked -h 0.0.0.0 -p 3000 --build-entry-script-path=./build.sh \
   --github-webhook-secret=<string> --github-watch-push-branch=master \
   --discord-webhook-url=<string>
 ```
