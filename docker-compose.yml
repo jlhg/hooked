@@ -1,3 +1,4 @@
+name: "hooked"
 x-common: &common
   build: .
 services:
