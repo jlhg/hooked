@@ -4,7 +4,7 @@ use clap::Parser;
 #[derive(Parser)]
 #[command(version, about, long_about = None, disable_help_flag = true)]
 pub struct Config {
-    #[arg(short = '?', long = "help", action = ArgAction::Help, help = "Print help")]
+    #[arg(short = '?', long = "help", action = ArgAction::Help, help = "Print help", required = false)]
     pub help: bool,
 
     /// Path to the log file.
