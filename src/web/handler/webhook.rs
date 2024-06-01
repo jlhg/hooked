@@ -59,7 +59,7 @@ pub async fn post_webhooks_github<'a>(
                         .to_string();
 
                     if branch.is_empty() {
-                        return Err(HttpError::BadRequest("ref"));
+                        return Ok(HttpSuccess::Success("unhandled ref"));
                     }
 
                     if branch == ctx.config.github_watch_push_branch {
