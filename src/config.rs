@@ -1,5 +1,6 @@
 use clap::ArgAction;
 use clap::Parser;
+use std::fs;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None, disable_help_flag = true)]
@@ -24,7 +25,7 @@ pub struct Config {
     /// [Creating webhooks - GitHub
     /// Docs](https://docs.github.com/en/webhooks/using-webhooks/creating-webhooks)
     /// for creating a webhook and setting the secret token.
-    #[arg(long, env)]
+    #[arg(long, env, value_parser = parse_secret_or_env)]
     pub github_webhook_secret: String,
 
     /// The Git branch name to watch.
@@ -35,11 +36,21 @@ pub struct Config {
     /// channel. See [Intro to Webhooks –
     /// Discord](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks)
     /// for creating a Discord webhook URL.
-    #[arg(long, env)]
+    #[arg(long, env, value_parser = parse_secret_or_env)]
     pub discord_webhook_url: String,
 
     #[arg(short = '?', long, action = ArgAction::Help, help = "Print help")]
     pub help: (),
+}
+
+fn parse_secret_or_env(value: &str) -> Result<String, String> {
+    if value.starts_with("/run/secrets/") {
+        fs::read_to_string(value)
+            .map(|s| s.trim().to_string())
+            .map_err(|e| format!("Failed to read secret file: {}", e))
+    } else {
+        Ok(value.to_string())
+    }
 }
 
 impl Config {

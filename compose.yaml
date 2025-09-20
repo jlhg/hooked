@@ -16,9 +16,12 @@ services:
       - HOOKED_HOST=0.0.0.0
       - HOOKED_PORT=3000
       - BUILD_ENTRY_SCRIPT_PATH=./build.sh
-      - GITHUB_WEBHOOK_SECRET=
+      - GITHUB_WEBHOOK_SECRET=/run/secrets/github_webhook_secret
       - GITHUB_WATCH_PUSH_BRANCH=
-      - DISCORD_WEBHOOK_URL=
+      - DISCORD_WEBHOOK_URL=/run/secrets/discord_webhook_url
+    secrets:
+      - github_webhook_secret
+      - discord_webhook_url
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
@@ -28,3 +31,7 @@ services:
 secrets:
   cf_tunnel_token:
     file: ./.secrets/cf_tunnel_token
+  github_webhook_secret:
+    file: ./.secrets/github_webhook_secret
+  discord_webhook_url:
+    file: ./.secrets/discord_webhook_url
