@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM rust:1.77.2-alpine as build
+FROM rust:1.77.2-alpine AS build
 WORKDIR /app
 RUN apk add --no-cache musl-dev openssl-dev openssl-libs-static pkgconfig
 COPY . /app
