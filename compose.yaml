@@ -1,19 +1,16 @@
-name: "hooked"
-x-common: &common
-  build: .
 services:
-  web:
-    <<: *common
-    command: "hooked"
+  hooked:
+    build: .
+    restart: unless-stopped
     volumes:
-      - ./srv/web/:/app/
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/service/myrepo/:/repo/
-      - /home/service/.ssh/config:/home/service/.ssh/config:ro
-      - /home/service/.ssh/id_ed25519-myrepo:/home/service/.ssh/id_ed25519-myrepo:ro
-      - /home/service/.ssh/id_ed25519-myrepodep:/repo/id_ed25519:ro
-    ports:
-      - 3000:3000
+      - ./.srv/hooked/:/app/
+      # - /home/service/myrepo/:/repo/
+      # - /home/service/.ssh/config:/home/service/.ssh/config:ro
+      # - /home/service/.ssh/id_ed25519-myrepo:/home/service/.ssh/id_ed25519-myrepo:ro
+      # - /home/service/.ssh/id_ed25519-myrepodep:/repo/id_ed25519:ro
+    expose:
+      - 3000
     environment:
       - LOG_FILE_PATH=log/app.log
       - HOOKED_HOST=0.0.0.0
@@ -22,3 +19,12 @@ services:
       - GITHUB_WEBHOOK_SECRET=
       - GITHUB_WATCH_PUSH_BRANCH=
       - DISCORD_WEBHOOK_URL=
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token-file /run/secrets/cf_tunnel_token
+    secrets:
+      - cf_tunnel_token
+secrets:
+  cf_tunnel_token:
+    file: ./.secrets/cf_tunnel_token

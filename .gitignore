@@ -1,4 +1,11 @@
-/target
-/tmp
-/log
-/srv
+/target/
+/tmp/
+/log/
+
+# Docker files
+docker-compose.*.yaml
+docker-compose.*.yml
+compose.*.yaml
+compose.*.yml
+/.secrets/
+/.srv/
