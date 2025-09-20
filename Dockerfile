@@ -8,5 +8,8 @@ RUN cargo install --locked --path .
 FROM docker:latest
 RUN apk add --no-cache git
 COPY --from=build /usr/local/cargo/bin/hooked /usr/local/bin/hooked
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 WORKDIR /app
-CMD hooked
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["hooked"]

@@ -1,9 +1,35 @@
-services:
-  hooked:
-    build: .
+  docker-socket-proxy:
+    image: tecnativa/docker-socket-proxy:latest
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CONTAINERS=1
+      - IMAGES=1
+      - AUTH=1
+      - PING=1
+      - VERSION=1
+      - BUILD=1
+      - BUILDER=1
+      - COMMIT=1
+      - EXEC=1
+      - LOGS=1
+      - NETWORKS=1
+      - VOLUMES=1
+      - SERVICES=1
+      - TASKS=1
+      - POST=1
+    expose:
+      - 2375
+    networks:
+      - docker-proxy
+
+  hooked:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - docker-socket-proxy
+    volumes:
       - ./.srv/hooked/:/app/
       # - /home/service/myrepo/:/repo/
       # - /home/service/.ssh/config:/home/service/.ssh/config:ro
@@ -19,15 +45,23 @@ services:
       - GITHUB_WEBHOOK_SECRET=/run/secrets/github_webhook_secret
       - GITHUB_WATCH_PUSH_BRANCH=
       - DISCORD_WEBHOOK_URL=/run/secrets/discord_webhook_url
+      - DOCKER_HOST=tcp://docker-socket-proxy:2375
     secrets:
       - github_webhook_secret
       - discord_webhook_url
+      - github_pat
+    networks:
+      - docker-proxy
+      - default
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
     command: tunnel --no-autoupdate run --token-file /run/secrets/cf_tunnel_token
     secrets:
       - cf_tunnel_token
+networks:
+  docker-proxy:
+
 secrets:
   cf_tunnel_token:
     file: ./.secrets/cf_tunnel_token
@@ -35,3 +69,5 @@ secrets:
     file: ./.secrets/github_webhook_secret
   discord_webhook_url:
     file: ./.secrets/discord_webhook_url
+  github_pat:
+    file: ./.secrets/github_pat
