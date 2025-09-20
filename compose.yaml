@@ -31,10 +31,7 @@ services:
       - docker-socket-proxy
     volumes:
       - ./.srv/hooked/:/app/
-      # - /home/service/myrepo/:/repo/
-      # - /home/service/.ssh/config:/home/service/.ssh/config:ro
-      # - /home/service/.ssh/id_ed25519-myrepo:/home/service/.ssh/id_ed25519-myrepo:ro
-      # - /home/service/.ssh/id_ed25519-myrepodep:/repo/id_ed25519:ro
+      # - /path/to/repo/:/repo/
     expose:
       - 3000
     environment:
@@ -48,11 +45,11 @@ services:
       - DOCKER_HOST=tcp://docker-socket-proxy:2375
     secrets:
       - github_webhook_secret
-      - discord_webhook_url
       - github_pat
+      - discord_webhook_url
     networks:
-      - docker-proxy
       - default
+      - docker-proxy
   cloudflared:
     image: cloudflare/cloudflared:latest
     restart: unless-stopped
@@ -64,11 +61,11 @@ networks:
   docker-proxy:
 
 secrets:
-  cf_tunnel_token:
-    file: ./.secrets/cf_tunnel_token
   github_webhook_secret:
     file: ./.secrets/github_webhook_secret
-  discord_webhook_url:
-    file: ./.secrets/discord_webhook_url
   github_pat:
     file: ./.secrets/github_pat
+  discord_webhook_url:
+    file: ./.secrets/discord_webhook_url
+  cf_tunnel_token:
+    file: ./.secrets/cf_tunnel_token
