@@ -1,3 +1,4 @@
+services:
   docker-socket-proxy:
     image: tecnativa/docker-socket-proxy:latest
     restart: unless-stopped
@@ -23,9 +24,8 @@
       - 2375
     networks:
       - docker-proxy
-
   hooked:
-    build: .
+    image: ghcr.io/jlhg/hooked:latest
     restart: unless-stopped
     depends_on:
       - docker-socket-proxy
@@ -59,6 +59,7 @@
     command: tunnel --no-autoupdate run --token-file /run/secrets/cf_tunnel_token
     secrets:
       - cf_tunnel_token
+
 networks:
   docker-proxy:
 
