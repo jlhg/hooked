@@ -15,7 +15,9 @@ if [ -f "/run/secrets/github_pat" ]; then
     chmod 600 ~/.git-credentials
 
     # Convert SSH URLs to HTTPS
+    git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
     git config --global url."https://github.com/".insteadOf "git@github.com:"
+    git config --global url."https://github.com/".insteadOf "git+ssh://git@github.com/"
 
     echo "GitHub PAT configured for repository access"
 else
